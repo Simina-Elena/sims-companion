@@ -17,32 +17,40 @@ class ChallengeGenerator:
     def _get_llm(cls):
         return ChatOpenAI(
             model="gpt-5-nano",
+            max_tokens=600
         )
     
     @classmethod
     def generate_challenge(cls, db: Session, session_id: str, packs: list[str], theme: str) -> ChallengeLLMResponse:
         llm = cls._get_llm()
 
-        format_instructions = PydanticOutputParser(pydantic_object=ChallengeLLMResponse).get_format_instructions()
+        challenge_parser = PydanticOutputParser(pydantic_object=ChallengeLLMResponse)
 
-        prompt = ChatPromptTemplate.from_template(
-            CHALLENGE_PROMPT.format(
-                theme=theme,
-                packs=packs,
-                format_instructions=format_instructions
+        prompt = ChatPromptTemplate.from_messages([
+            (
+               "system", CHALLENGE_PROMPT
+            ),
+            (
+                "human",
+                f"Create the challenge with this theme: {theme} based on these packages: {packs}."
             )
+        ]).partial(theme=theme, packs=packs, format_instructions=challenge_parser.get_format_instructions())
+
+        raw_response = llm.invoke(prompt.invoke({}))
+        print("RAW LLM RESPONSE:", raw_response)
+
+        response_text = raw_response
+        if hasattr(raw_response, 'content'):
+            response_text = raw_response.content
+        challenge_structure = challenge_parser.parse(response_text)
+
+        challenge_db = Challenge(
+            title=challenge_structure.title,
+            description=challenge_structure.description,
+            session_id=session_id,
         )
 
-        response = llm.predict(prompt.format_messages().to_messages())
-
-        parsed_response = PydanticOutputParser(pydantic_object=ChallengeLLMResponse).parse(response)
-
-        challenge = Challenge(
-            title=parsed_response.title,
-            description=parsed_response.description,
-        )
-
-        db.add(challenge)
+        db.add(challenge_db)
         db.commit()
 
-        return challenge
+        return challenge_db

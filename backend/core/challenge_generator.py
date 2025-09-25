@@ -16,8 +16,8 @@ class ChallengeGenerator:
     @classmethod
     def _get_llm(cls):
         return ChatOpenAI(
-            model="gpt-5-nano",
-            max_tokens=600
+            model="gpt-4.1-mini",
+            max_tokens=800
         )
     
     @classmethod
@@ -47,8 +47,11 @@ class ChallengeGenerator:
         challenge_db = Challenge(
             title=challenge_structure.title,
             description=challenge_structure.description,
+            rules=challenge_structure.rules,
             session_id=session_id,
         )
+
+        print("challengeDB",challenge_db)
 
         db.add(challenge_db)
         db.commit()

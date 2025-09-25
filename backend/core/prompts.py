@@ -4,9 +4,10 @@ CHALLENGE_PROMPT = """
 
                 The challenge should include:
                 1. A short and catchy title
-                2. A detailed description with clear goals and rules
-                3. The description must only use features from The Sims 4 base game and the packs provided by the user
-                4. The challenge must be playable and self-contained
+                2. A short overview of the challenge
+                3. A list of rules (steps) to follow for winning
+                4. The description and rules must only use features from The Sims 4 base game and the packs provided by the user
+                5. The challenge must be playable and self-contained
 
                 Input from user:
                 - Theme: {theme}
@@ -20,6 +21,7 @@ CHALLENGE_PROMPT = """
 json_structure = """
   {
     "title": "Challenge Title",
-    "description": "Detailed description of the challenge with goals and rules"
+    "description": "A short overview of the challenge",
+    "rules": list of rules that needed to be followed for winning
   }
 """

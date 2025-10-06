@@ -1,5 +1,5 @@
 import client from "./client";
-
+import { type Status } from "../types/status";
 export interface CreateChallengeRequest {
   theme: string;
   packs: string[];
@@ -7,7 +7,7 @@ export interface CreateChallengeRequest {
 
 export interface JobResponse {
   job_id: string;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: Status;
   challenge_id: number | null;
   error?: string;
 }
@@ -33,5 +33,7 @@ export const getChallenge = async (challengeId: number) => {
   const res = await client.get<Challenge>(
     `/challenges/${challengeId}/complete`
   );
+  console.log(res.data, "CHALLENGES");
+
   return res.data;
 };

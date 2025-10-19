@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export const useJobStore = create((set) => ({
+type JobState = {
+  jobId: string | null;
+  setJobId: (value: string) => void;
+};
+
+export const useJobStore = create<JobState>((set) => ({
   jobId: null,
   setJobId: (value: string) => set(() => ({ jobId: value })),
 }));

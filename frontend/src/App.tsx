@@ -3,6 +3,10 @@ import { getChallenge, type Challenge } from "./api/challenges";
 import CreateChallenge from "./components/CreateChallenge";
 import { useJobStore } from "./state/job";
 import { useState } from "react";
+import { TypographyH1 } from "./components/TypographyH1";
+import CustomSpinner from "./components/CustomSpinner";
+import { Button } from "./components/ui/button";
+import DisplayChallenge from "./components/DisplayChallenge";
 
 export default function App() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
@@ -19,32 +23,26 @@ export default function App() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>Sims Companion</h1>
+      <TypographyH1>Sims Companion</TypographyH1>
 
       {!jobId && <CreateChallenge />}
 
       {job && !challenge && (
         <div>
-          <p>Status: {job.status}</p>
+          {job.status === "processing" && <CustomSpinner status={job.status} />}
           {job.status === "completed" && (
-            <button onClick={fetchChallenge}>View Challenge</button>
+            <Button
+              onClick={fetchChallenge}
+              className="bg-emerald-800 hover:bg-emerald-600"
+            >
+              View Challenge
+            </Button>
           )}
           {job.status === "failed" && <p>Error: {job.error}</p>}
         </div>
       )}
 
-      {challenge && (
-        <div>
-          <h2>{challenge.title}</h2>
-          <p>{challenge.description}</p>
-          <h3>Rules</h3>
-          <ul>
-            {challenge.rules.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {challenge && <DisplayChallenge challenge={challenge} />}
     </div>
   );
 }

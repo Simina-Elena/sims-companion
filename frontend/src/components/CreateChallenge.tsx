@@ -1,29 +1,13 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  challengeSchema,
-  type CreateChallenge,
-} from "../types/challengeSchema";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { createChallenge } from "../api/challenges";
 import { useJobStore } from "../state/job";
+import ChallengeForm from "./ChallengeForm";
+import CustomCard from "./CustomCard";
+import { type CreateChallenge } from "../types/challengeSchema";
 
 export default function CreateChallenge() {
   const setJobId = useJobStore((state) => state.setJobId);
 
-  const form = useForm<CreateChallenge>({
-    resolver: zodResolver(challengeSchema),
-  });
-
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: CreateChallenge) => {
     console.log("✅ Valid Data:", data);
     const { theme, packs } = data;
     const packsArray = packs.split(",").map((pack: string) => pack.trim());
@@ -32,44 +16,13 @@ export default function CreateChallenge() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="theme"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Theme</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter challenge theme" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="packs"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Packs</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter the packs you want separated by comma"
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        {form.formState.errors && (
-          <div style={{ color: "red", marginBottom: "1rem" }}>
-            {Object.values(form.formState.errors).map((error) =>
-              console.log(error)
-            )}
-          </div>
-        )}
-        <Button type="submit">Create Challenge</Button>
-      </form>
-    </Form>
+    <div style={{ justifyContent: "center", display: "flex" }}>
+      <CustomCard
+        cardTitle="Create a Challenge"
+        className="w-full max-w-sm bg-neutral-100"
+      >
+        <ChallengeForm onSubmit={onSubmit} />
+      </CustomCard>
+    </div>
   );
 }

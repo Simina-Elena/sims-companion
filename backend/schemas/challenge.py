@@ -10,6 +10,7 @@ class ChallengeResponse(BaseModel):
     id: int
     title: str
     description: str
+    rules: list[str]
     is_completed: bool
     created_at: datetime
     session_id: str

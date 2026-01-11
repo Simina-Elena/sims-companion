@@ -1,22 +1,27 @@
 import { useJobPolling } from "./hooks/useJobPolling";
-import { getChallenge, type Challenge } from "./api/challenges";
+import { getChallenge } from "./api/challenges";
 import CreateChallenge from "./components/CreateChallenge";
 import { useJobStore } from "./state/job";
-import { useState } from "react";
+import { useChallengeStore } from "./state/challenge";
 import { TypographyH1 } from "./components/TypographyH1";
 import CustomSpinner from "./components/CustomSpinner";
 import { Button } from "./components/ui/button";
 import DisplayChallenge from "./components/DisplayChallenge";
 
 export default function App() {
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const jobId = useJobStore((state) => state.jobId);
+  const { jobId } = useJobStore();
+  const { challenge, setChallenge } = useChallengeStore();
 
   const job = useJobPolling(jobId);
 
   async function fetchChallenge() {
     if (job?.challenge_id) {
       const c = await getChallenge(job.challenge_id);
+      // const c = {
+      //   title: "Test",
+      //   description: "Test description",
+      //   rules: ["first rule test", "second rule test", "third rule test"],
+      // };
       setChallenge(c);
     }
   }
@@ -42,7 +47,7 @@ export default function App() {
         </div>
       )}
 
-      {challenge && <DisplayChallenge challenge={challenge} />}
+      {challenge && <DisplayChallenge />}
     </div>
   );
 }

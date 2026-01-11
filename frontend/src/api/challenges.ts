@@ -1,23 +1,11 @@
 import client from "./client";
-import { type Status } from "../types/status";
-export interface CreateChallengeRequest {
-  theme: string;
-  packs: string[];
-}
-
-export interface JobResponse {
-  job_id: string;
-  status: Status;
-  challenge_id: number | null;
-  error?: string;
-}
-
-export interface Challenge {
-  id: number;
-  title: string;
-  description: string;
-  rules: string[];
-}
+import type { JobResponse } from "@/types/job";
+import type {
+  Challenge,
+  ChallengeStatus,
+  CreateChallengeRequest,
+} from "@/types/challenge";
+import { mockChallenge } from "./mockData";
 
 export const createChallenge = async (data: CreateChallengeRequest) => {
   const res = await client.post<JobResponse>("/challenges/create", data);
@@ -34,6 +22,18 @@ export const getChallenge = async (challengeId: number) => {
     `/challenges/${challengeId}/complete`
   );
   console.log(res.data, "CHALLENGES");
+
+  return res.data;
+};
+
+export const updateChallengeStatus = async (
+  challengeId: number,
+  status: ChallengeStatus
+) => {
+  const res = await client.patch<Challenge>(
+    `/challenges/${challengeId}/status`,
+    status
+  );
 
   return res.data;
 };

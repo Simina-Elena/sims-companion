@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from db.database import get_db, SessionLocal
-from schemas.challenge import ChallengeResponse, CreateChallengeRequest
+from schemas.challenge import ChallengeResponse, CreateChallengeRequest, UpdateChallengeStatusRequest
 from schemas.job import StoryJobResponse
 from models.job import StoryJob
 from models.challenge import Challenge
@@ -84,4 +84,16 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
     
+    return challenge
+
+@router.patch("/{challenge_id}/status", response_model=ChallengeResponse)
+def update_challenge_status(challenge_id: int, request: UpdateChallengeStatusRequest, db: Session = Depends(get_db)):
+    challenge = db.query(Challenge).filter(Challenge.id == challenge_id).first()
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    
+    challenge.is_completed = request.is_completed
+    db.commit()
+    db.refresh(challenge)
+
     return challenge

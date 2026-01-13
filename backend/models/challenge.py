@@ -16,14 +16,21 @@ class Challenge(Base):
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("User", back_populates="challenges")
-    rules = relationship("Rule")
 
-    class Rule(Base):
-        __tablename__ = "rules"
+    rules = relationship(
+        "Rule",
+        back_populates="challenge",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
-        id = Column(Integer, primary_key=True, index=True)
-        challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"))
-        text = Column(String, nullable=False)
+class Rule(Base):
+    __tablename__ = "rules"
 
-        challenge = relationship("Challenge", back_populates="rules")
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"), nullable=False)
+    text = Column(String, nullable=False)
+
+    challenge = relationship("Challenge", back_populates="rules")
+
 

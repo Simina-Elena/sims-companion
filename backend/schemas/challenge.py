@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from core.models import Rule as SharedRule
 
 
@@ -31,3 +31,6 @@ class ChallengeResponse(BaseModel):
 
 class UpdateChallengeStatusRequest(BaseModel):
     is_completed: bool
+
+class UpdateRuleText(BaseModel):
+    text: str = Field(min_length=1, max_length=300)

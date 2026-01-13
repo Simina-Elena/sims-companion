@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from db.database import get_db, SessionLocal
-from schemas.challenge import ChallengeResponse, CreateChallengeRequest, UpdateChallengeStatusRequest
+from schemas.challenge import ChallengeResponse, CreateChallengeRequest, UpdateChallengeStatusRequest, UpdateRuleText
 from schemas.job import StoryJobResponse
 from models.job import StoryJob
-from models.challenge import Challenge
+from models.challenge import Challenge, Rule
 from core.challenge_generator import ChallengeGenerator
 
 router = APIRouter(
@@ -97,3 +97,15 @@ def update_challenge_status(challenge_id: int, request: UpdateChallengeStatusReq
     db.refresh(challenge)
 
     return challenge
+
+@router.patch("/{challenge_id}/rule/{rule_id}")
+def update_rule(challenge_id: int, rule_id: int, body: UpdateRuleText, db: Session = Depends(get_db)):
+    rule = db.query(Rule).filter(Rule.id == rule_id, Rule.challenge_id == challenge_id).first()
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
+
+    rule.text = body.text.strip()
+    db.commit()
+    db.refresh(rule)
+
+    return {"id": rule.id, "text": rule.text}

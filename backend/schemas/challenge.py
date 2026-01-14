@@ -12,6 +12,9 @@ class CreateChallengeRequest(BaseModel):
 class RuleObject(SharedRule):
     # API responses require an id
     id: int
+    class Config:
+        # for returning DB objects
+        from_attributes = True
 
 
 class ChallengeResponse(BaseModel):
@@ -29,7 +32,7 @@ class ChallengeResponse(BaseModel):
         from_attributes = True
 
 
-class UpdateChallengeStatusRequest(BaseModel):
+class UpdateStatusRequest(BaseModel):
     is_completed: bool
 
 class UpdateRuleText(BaseModel):

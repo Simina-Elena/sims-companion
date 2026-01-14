@@ -6,11 +6,13 @@ import { ChallengeActions } from "./ChallengeActions";
 import { useState, type ChangeEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { updateRuleText } from "@/api/challenges";
+import type { Challenge } from "@/types/challenge";
 
 export default function DisplayChallenge() {
   const { challenge, updateChallenge } = useChallengeStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editedRule, setEditedRule] = useState("");
+  const [editingRuleText, setEditingRuleText] = useState("");
 
   if (!challenge) {
     return <div>No challenge to display.</div>;
@@ -18,7 +20,7 @@ export default function DisplayChallenge() {
 
   const handleEdit = (index: number, currentRule: string) => {
     setEditingIndex(index);
-    setEditedRule(currentRule);
+    setEditingRuleText(currentRule);
   };
 
   const handleDelete = () => {
@@ -26,12 +28,20 @@ export default function DisplayChallenge() {
   };
 
   const handleEditRule = (e: ChangeEvent<HTMLInputElement>) => {
-    setEditedRule(e.target.value);
+    setEditingRuleText(e.target.value);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (editingIndex !== null) {
+      const updatedChallenge = await updateRuleText({
+        challengeId: challenge.id,
+        ruleId: editingIndex,
+        text: editingRuleText,
+      });
+      updateChallenge(updatedChallenge);
+    }
     setEditingIndex(null);
-    setEditedRule("");
+    setEditingRuleText("");
   };
 
   return (
@@ -49,7 +59,7 @@ export default function DisplayChallenge() {
             {editingIndex === rule.id ? (
               <div className="flex items-center gap-2 w-full">
                 <Input
-                  value={editedRule}
+                  value={editingRuleText}
                   onChange={handleEditRule}
                   className="flex-1"
                 />

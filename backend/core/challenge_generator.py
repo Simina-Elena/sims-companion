@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from models.challenge import Challenge
-from core.models import ChallengeLLMResponse, Rule
-
+from models.challenge import Challenge, Rule as RuleModel
+from core.models import ChallengeLLMResponse, Rule as RuleSchema 
 
 class ChallengeGenerator:
     @classmethod
@@ -12,22 +12,22 @@ class ChallengeGenerator:
         """
 
         # Build deterministic mock rules using the shared `Rule` Pydantic model
-        mock_rules: list[Rule] = []
+        mock_rules: list[RuleSchema] = []
         for i, pack in enumerate(packs, start=1):
-            mock_rules.append(Rule(text=f"Use package '{pack}' to implement feature {i}."))
+            mock_rules.append(RuleSchema(text=f"Use package '{pack}' to implement feature {i}."))
 
         extra = [
             "Write unit tests for core functionality.",
             "Document the setup and usage in README.",
         ]
         for e in extra:
-            mock_rules.append(Rule(text=e))
+            mock_rules.append(RuleSchema(text=e, is_completed=False))
 
         challenge_structure = ChallengeLLMResponse(
             title=f"Mock Challenge: {theme}",
             description=f"This is a mock challenge generated for theme '{theme}'.",
             rules=mock_rules,
-            isCompleted=False,
+            is_completed=False,
         )
 
         # Persist: create Challenge, flush to get id, then create Rule rows
@@ -41,8 +41,7 @@ class ChallengeGenerator:
         db.flush()
 
         for r in challenge_structure.rules:
-            text = getattr(r, "text", r)
-            rule_row = Challenge.Rule(challenge_id=challenge_db.id, text=text)
+            rule_row = RuleModel(challenge_id=challenge_db.id, text=r.text)
             db.add(rule_row)
 
         db.commit()

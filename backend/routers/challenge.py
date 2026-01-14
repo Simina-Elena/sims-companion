@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from db.database import get_db, SessionLocal
-from schemas.challenge import ChallengeResponse, CreateChallengeRequest, UpdateChallengeStatusRequest, UpdateRuleText
+from schemas.challenge import ChallengeResponse, CreateChallengeRequest, UpdateStatusRequest, UpdateRuleText
 from schemas.job import StoryJobResponse
 from models.job import StoryJob
 from models.challenge import Challenge, Rule
@@ -87,7 +87,7 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     return challenge
 
 @router.patch("/{challenge_id}/status", response_model=ChallengeResponse)
-def update_challenge_status(challenge_id: int, request: UpdateChallengeStatusRequest, db: Session = Depends(get_db)):
+def update_challenge_status(challenge_id: int, request: UpdateStatusRequest, db: Session = Depends(get_db)):
     challenge = db.query(Challenge).filter(Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
@@ -98,7 +98,7 @@ def update_challenge_status(challenge_id: int, request: UpdateChallengeStatusReq
 
     return challenge
 
-@router.patch("/{challenge_id}/rule/{rule_id}")
+@router.patch("/{challenge_id}/rules/{rule_id}")
 def update_rule(challenge_id: int, rule_id: int, body: UpdateRuleText, db: Session = Depends(get_db)):
     rule = db.query(Rule).filter(Rule.id == rule_id, Rule.challenge_id == challenge_id).first()
     if not rule:
@@ -108,4 +108,4 @@ def update_rule(challenge_id: int, rule_id: int, body: UpdateRuleText, db: Sessi
     db.commit()
     db.refresh(rule)
 
-    return {"id": rule.id, "text": rule.text}
+    return rule;

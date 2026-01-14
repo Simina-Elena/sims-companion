@@ -30,6 +30,7 @@ class Rule(Base):
     id = Column(Integer, primary_key=True, index=True)
     challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"), nullable=False)
     text = Column(String, nullable=False)
+    is_completed = Column(Boolean, default=False)
 
     challenge = relationship("Challenge", back_populates="rules")
 

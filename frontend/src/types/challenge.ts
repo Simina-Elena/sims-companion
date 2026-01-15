@@ -3,10 +3,10 @@ export interface CreateChallengeRequest {
   packs: string[];
 }
 
-export interface UpdateRuleText {
+export interface RuleData {
   challengeId: number;
   ruleId: number;
-  text: string;
+  ruleToUpdate: RuleToUpdate;
 }
 
 export type Challenge = {
@@ -25,3 +25,5 @@ export type Rule = {
 export type ChallengeStatus = {
   isCompleted: boolean;
 };
+
+type RuleToUpdate = Partial<Omit<Rule, "id">>;

@@ -6,20 +6,21 @@ import { ChallengeActions } from "./ChallengeActions";
 import { useState, type ChangeEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { updateRuleText } from "@/api/challenges";
+import { updateRule } from "@/api/challenges";
+import type { Rule } from "@/types/challenge";
 
 export default function DisplayChallenge() {
-  const { challenge, updateRule } = useChallengeStore();
+  const { challenge, updateRuleState } = useChallengeStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingRuleText, setEditingRuleText] = useState("");
+  const [editingRule, setEditingRule] = useState<Rule>();
 
   if (!challenge) {
     return <div>No challenge to display.</div>;
   }
 
-  const handleEdit = (index: number, currentRule: string) => {
-    setEditingIndex(index);
-    setEditingRuleText(currentRule);
+  const handleEdit = (rule: Rule) => {
+    setEditingIndex(rule.id);
+    setEditingRule(rule);
   };
 
   const handleDelete = () => {
@@ -27,20 +28,23 @@ export default function DisplayChallenge() {
   };
 
   const handleEditRule = (e: ChangeEvent<HTMLInputElement>) => {
-    setEditingRuleText(e.target.value);
+    const newText = e.target.value;
+    if (editingRule) {
+      setEditingRule({ ...editingRule, text: newText });
+    }
   };
 
   const handleSave = async () => {
-    if (editingIndex !== null) {
-      const updatedRule = await updateRuleText({
+    if (editingIndex !== null && editingRule) {
+      const updatedRule = await updateRule({
         challengeId: challenge.id,
         ruleId: editingIndex,
-        text: editingRuleText,
+        ruleToUpdate: editingRule,
       });
-      updateRule(updatedRule);
+      updateRuleState(updatedRule);
     }
     setEditingIndex(null);
-    setEditingRuleText("");
+    setEditingRule(undefined);
   };
 
   return (
@@ -58,7 +62,7 @@ export default function DisplayChallenge() {
             {editingIndex === rule.id ? (
               <div className="flex items-center gap-2 w-full">
                 <Input
-                  value={editingRuleText}
+                  value={editingRule?.text}
                   onChange={handleEditRule}
                   className="flex-1"
                 />
@@ -78,7 +82,7 @@ export default function DisplayChallenge() {
                   </p>
                 </Label>
                 <ChallengeActions
-                  onEdit={() => handleEdit(rule.id, rule.text)}
+                  onEdit={() => handleEdit(rule)}
                   onDelete={() => handleDelete()}
                 />
               </>

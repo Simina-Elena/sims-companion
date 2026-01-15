@@ -34,6 +34,3 @@ class ChallengeResponse(BaseModel):
 
 class UpdateStatusRequest(BaseModel):
     is_completed: bool
-
-class UpdateRuleText(BaseModel):
-    text: str = Field(min_length=1, max_length=300)

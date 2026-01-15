@@ -5,7 +5,7 @@ type ChallengeState = {
   challenge: Challenge | null;
   setChallenge: (challenge: Challenge) => void;
   updateChallenge: (data: Partial<Challenge>) => void;
-  updateRule: (data: Rule) => void;
+  updateRuleState: (data: Rule) => void;
   deleteChallenge: () => void;
 };
 
@@ -16,7 +16,7 @@ export const useChallengeStore = create<ChallengeState>((set) => ({
     set((state) => ({
       challenge: state.challenge ? { ...state.challenge, ...data } : null,
     })),
-  updateRule: (updated: Rule) =>
+  updateRuleState: (updated: Rule) =>
     set((state) => {
       if (!state.challenge) return state;
       return {

@@ -5,7 +5,7 @@ import type {
   ChallengeStatus,
   CreateChallengeRequest,
   Rule,
-  UpdateRuleText,
+  RuleData,
 } from "@/types/challenge";
 
 export const createChallenge = async (
@@ -41,11 +41,13 @@ export const updateChallengeStatus = async (
   return res.data;
 };
 
-export const updateRuleText = async (data: UpdateRuleText): Promise<Rule> => {
-  const { challengeId, ruleId, text } = data;
+export const updateRule = async (data: RuleData): Promise<Rule> => {
+  const { challengeId, ruleId } = data;
+  const { text, is_completed } = data.ruleToUpdate;
 
   const res = await client.patch(`challenges/${challengeId}/rules/${ruleId}`, {
     text,
+    is_completed,
   });
 
   return res.data;

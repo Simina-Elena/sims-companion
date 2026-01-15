@@ -16,9 +16,10 @@ export type Challenge = {
   rules: Rule[];
 };
 
-type Rule = {
+export type Rule = {
   id: number;
   text: string;
+  is_completed: boolean;
 };
 
 export type ChallengeStatus = {

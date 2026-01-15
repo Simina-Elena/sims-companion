@@ -7,10 +7,9 @@ import { useState, type ChangeEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { updateRuleText } from "@/api/challenges";
-import type { Challenge } from "@/types/challenge";
 
 export default function DisplayChallenge() {
-  const { challenge, updateChallenge } = useChallengeStore();
+  const { challenge, updateRule } = useChallengeStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingRuleText, setEditingRuleText] = useState("");
 
@@ -33,12 +32,12 @@ export default function DisplayChallenge() {
 
   const handleSave = async () => {
     if (editingIndex !== null) {
-      const updatedChallenge = await updateRuleText({
+      const updatedRule = await updateRuleText({
         challengeId: challenge.id,
         ruleId: editingIndex,
         text: editingRuleText,
       });
-      updateChallenge(updatedChallenge);
+      updateRule(updatedRule);
     }
     setEditingIndex(null);
     setEditingRuleText("");

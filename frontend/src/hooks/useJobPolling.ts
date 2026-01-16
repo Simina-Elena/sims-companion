@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getJob } from "../api/challenges";
-import type { JobResponse } from "../api/challenges";
+import type { JobResponse } from "@/types/job";
 
 export function useJobPolling(jobId: string | null, interval = 2000) {
   const [job, setJob] = useState<JobResponse | null>(null);

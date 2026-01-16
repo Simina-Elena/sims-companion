@@ -3,20 +3,33 @@ import CustomCard from "./CustomCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ChallengeActions } from "./ChallengeActions";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { updateRule } from "@/api/challenges";
 import type { Rule } from "@/types/challenge";
+import { useDebouncedRuleUpdate } from "@/hooks/useDebouncedRuleUpdate";
 
 export default function DisplayChallenge() {
   const { challenge, updateRuleState } = useChallengeStore();
+  const getDebouncedUpdate = useDebouncedRuleUpdate();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingRule, setEditingRule] = useState<Rule>();
 
   if (!challenge) {
     return <div>No challenge to display.</div>;
   }
+
+  const handleToggleCompleted = async (rule: Rule, completed: boolean) => {
+    // optimistic update
+    updateRuleState({ ...rule, is_completed: completed });
+
+    getDebouncedUpdate(rule.id)({
+      challengeId: challenge.id,
+      ruleId: rule.id,
+      ruleToUpdate: { ...rule, is_completed: completed },
+    });
+  };
 
   const handleEdit = (rule: Rule) => {
     setEditingIndex(rule.id);
@@ -74,6 +87,11 @@ export default function DisplayChallenge() {
               <>
                 <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-teal-600 has-[[aria-checked=true]]:bg-teal-50 dark:has-[[aria-checked=true]]:border-teal-900 dark:has-[[aria-checked=true]]:bg-teal-950">
                   <Checkbox
+                    key={rule.id}
+                    checked={rule.is_completed}
+                    onCheckedChange={(val) =>
+                      handleToggleCompleted(rule, val === true)
+                    }
                     id={rule.id.toString()}
                     className="data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 data-[state=checked]:text-white dark:data-[state=checked]:border-teal-700 dark:data-[state=checked]:bg-teal-700"
                   />

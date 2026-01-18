@@ -3,15 +3,15 @@ import CustomCard from "./CustomCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ChallengeActions } from "./ChallengeActions";
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { updateRule } from "@/api/challenges";
+import { deleteRule, updateRule } from "@/api/challenges";
 import type { Rule } from "@/types/challenge";
 import { useDebouncedRuleUpdate } from "@/hooks/useDebouncedRuleUpdate";
 
 export default function DisplayChallenge() {
-  const { challenge, updateRuleState } = useChallengeStore();
+  const { challenge, updateRuleState, removeRule } = useChallengeStore();
   const getDebouncedUpdate = useDebouncedRuleUpdate();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingRule, setEditingRule] = useState<Rule>();
@@ -36,8 +36,13 @@ export default function DisplayChallenge() {
     setEditingRule(rule);
   };
 
-  const handleDelete = () => {
-    console.log("in delete");
+  const handleDelete = async (ruleId: number) => {
+    try {
+      await deleteRule(challenge.id, ruleId);
+      removeRule(ruleId);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleEditRule = (e: ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +106,7 @@ export default function DisplayChallenge() {
                 </Label>
                 <ChallengeActions
                   onEdit={() => handleEdit(rule)}
-                  onDelete={() => handleDelete()}
+                  onDelete={() => handleDelete(rule.id)}
                 />
               </>
             )}

@@ -52,3 +52,7 @@ export const updateRule = async (data: RuleData): Promise<Rule> => {
 
   return res.data;
 };
+
+export const deleteRule = async (challengeId: number, ruleId: number) => {
+  await client.delete(`challenges/${challengeId}/rules/${ruleId}`);
+};

@@ -6,7 +6,7 @@ type ChallengeState = {
   setChallenge: (challenge: Challenge) => void;
   updateChallenge: (data: Partial<Challenge>) => void;
   updateRuleState: (data: Rule) => void;
-  deleteChallenge: () => void;
+  removeRule: (ruleId: number) => void;
 };
 
 export const useChallengeStore = create<ChallengeState>((set) => ({
@@ -28,5 +28,14 @@ export const useChallengeStore = create<ChallengeState>((set) => ({
         },
       };
     }),
-  deleteChallenge: () => set({ challenge: null }),
+  removeRule: (ruleId: number) =>
+    set((state) => {
+      if (!state.challenge) return state;
+      return {
+        challenge: {
+          ...state.challenge,
+          rules: state.challenge.rules.filter((r) => r.id !== ruleId),
+        },
+      };
+    }),
 }));

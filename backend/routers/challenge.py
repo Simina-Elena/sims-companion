@@ -109,3 +109,14 @@ def update_rule(challenge_id: int, rule_id: int, body: SharedRule, db: Session =
     db.refresh(rule)
 
     return rule;
+
+@router.delete("/{challenge_id}/rules/{rule_id}")
+def delete_rule(challenge_id: int, rule_id: int, db: Session = Depends(get_db)):
+    rule = db.query(Rule).filter(Rule.id == rule_id, Rule.challenge_id == challenge_id).first()
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    
+    db.delete(rule)
+    db.commit()
+
+    return rule
